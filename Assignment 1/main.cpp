@@ -227,7 +227,9 @@ int main( int argc, char * argv[] )
 			// call function in the FileTransfer instance for getting packet
 			// the function will include the protocol header and part of file
 			// FileTransfer will keep track of the current and total ammount sent
-			// and also in what order they were sent in
+			// and also in what order they were sent in.
+			// sends a specific packet indicating that it has transferred everything
+			// with the checksum
 			// 
 			// SERVER
 			// checks to see if any packets were received from FileTransfer
@@ -254,6 +256,9 @@ int main( int argc, char * argv[] )
 			// validates the packet and determines if the protocol is valid
 			// sends the packet to a FileTransfer function that saves it locally
 			// FileTransfer will store the total amount received
+			// 
+			// if the packet received is to indicate end of file transfer
+			// generate a checksum for the file and compare it with the one received
 		}
 		
 		// show packets that were acked this frame
