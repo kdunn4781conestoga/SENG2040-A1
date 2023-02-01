@@ -19,11 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FileTransfer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SimpleProtocol.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FileTransfer.h" />
     <ClInclude Include="Net.h" />
+    <ClInclude Include="SimpleProtocol.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
