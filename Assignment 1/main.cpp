@@ -136,6 +136,8 @@ int main( int argc, char * argv[] )
 	Mode mode = Server;
 	Address address;
 
+	// variables for storing filenames
+
 	if ( argc >= 2 )
 	{
 		int a,b,c,d;
@@ -144,6 +146,8 @@ int main( int argc, char * argv[] )
 			mode = Client;
 			address = Address(a,b,c,d,ServerPort);
 		}
+
+		// additional argument parsing for input/output filenames
 	}
 
 	// initialize
@@ -174,6 +178,10 @@ int main( int argc, char * argv[] )
 	float statsAccumulator = 0.0f;
 	
 	FlowControl flowControl;
+
+	// create instance of FileTransfer class
+	// constructor would require the input/output filenames and the mode
+	// if the mode is Client then it will fload() the file storing it in the instance
 	
 	while ( true )
 	{
@@ -213,6 +221,18 @@ int main( int argc, char * argv[] )
 		{
 			unsigned char packet[PacketSize];
 			memset( packet, 0, sizeof( packet ) );
+
+			// CLIENT
+			// check if any packets need to be resent
+			// call function in the FileTransfer instance for getting packet
+			// the function will include the protocol header and part of file
+			// FileTransfer will keep track of the current and total ammount sent
+			// and also in what order they were sent in
+			// 
+			// SERVER
+			// checks to see if any packets were received from FileTransfer
+			// calls FileTransfer function to get a packet to send back to the client
+			// that confirms the packet was sent
 			connection.SendPacket( packet, sizeof( packet ) );
 			sendAccumulator -= 1.0f / sendRate;
 		}
@@ -223,6 +243,17 @@ int main( int argc, char * argv[] )
 			int bytes_read = connection.ReceivePacket( packet, sizeof(packet) );
 			if ( bytes_read == 0 )
 				break;
+			//else
+			// 
+			// CLIENT
+			// here it checks for the server's return message
+			// FileTransfer processes it and determines if it's valid or needs to be resent
+			// this information would be stored in the instance of FileTransfer
+			// 
+			// SERVER
+			// validates the packet and determines if the protocol is valid
+			// sends the packet to a FileTransfer function that saves it locally
+			// FileTransfer will store the total amount received
 		}
 		
 		// show packets that were acked this frame
