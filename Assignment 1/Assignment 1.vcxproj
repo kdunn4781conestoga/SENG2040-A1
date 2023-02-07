@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileTransfer.h" />
+    <ClInclude Include="States.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="SimpleProtocol.h" />
   </ItemGroup>
