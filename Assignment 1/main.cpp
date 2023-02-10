@@ -17,6 +17,8 @@
 #include <vector>
 
 #include "Net.h"
+#include "FileSend.h"
+#include "FileReceive.h"
 
 //#define SHOW_ACKS
 
@@ -141,7 +143,7 @@ int main( int argc, char * argv[] )
 	if ( argc >= 2 )
 	{
 		int a,b,c,d;
-		if ( sscanf( argv[1], "%d.%d.%d.%d", &a, &b, &c, &d ) )
+		if ( sscanf_s( argv[1], "%d.%d.%d.%d", &a, &b, &c, &d ) )
 		{
 			mode = Client;
 			address = Address(a,b,c,d,ServerPort);
@@ -180,6 +182,14 @@ int main( int argc, char * argv[] )
 	FlowControl flowControl;
 
 	// create instance of FileTransfer class
+	FileTransfer* fileTransfer = NULL;
+
+	if (mode == Client)
+		fileTransfer = new FileSend("alice29.txt");
+	else
+		fileTransfer = new FileReceive();
+
+	fileTransfer->Setup();
 	// constructor would require the input/output filenames and the mode
 	// if the mode is Client then it will fload() the file storing it in the instance
 	
@@ -217,10 +227,16 @@ int main( int argc, char * argv[] )
 		
 		sendAccumulator += DeltaTime;
 		
+		// sending packets
 		while ( sendAccumulator > 1.0f / sendRate )
 		{
 			unsigned char packet[PacketSize];
 			memset( packet, 0, sizeof( packet ) );
+
+			char* filePacket = fileTransfer->GetPacket();
+
+			if (filePacket != NULL)
+				strcpy_s((char*)packet, PacketSize, filePacket);
 
 			// CLIENT
 			// check if any packets need to be resent
@@ -239,6 +255,7 @@ int main( int argc, char * argv[] )
 			sendAccumulator -= 1.0f / sendRate;
 		}
 		
+		// receiving packets
 		while ( true )
 		{
 			unsigned char packet[256];

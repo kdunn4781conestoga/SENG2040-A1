@@ -7,16 +7,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Assignment 1", "Assignment 
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
+		Debug - Client|x64 = Debug - Client|x64
+		Debug - Client|x86 = Debug - Client|x86
+		Debug - Server|x64 = Debug - Server|x64
+		Debug - Server|x86 = Debug - Server|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug|x64.ActiveCfg = Debug|x64
-		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug|x64.Build.0 = Debug|x64
-		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug|x86.ActiveCfg = Debug|Win32
-		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug|x86.Build.0 = Debug|Win32
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Client|x64.ActiveCfg = Debug - Client|x64
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Client|x64.Build.0 = Debug - Client|x64
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Client|x86.ActiveCfg = Debug - Client|Win32
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Client|x86.Build.0 = Debug - Client|Win32
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x64.ActiveCfg = Debug|x64
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x64.Build.0 = Debug|x64
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x86.ActiveCfg = Debug|Win32
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x86.Build.0 = Debug|Win32
 		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Release|x64.ActiveCfg = Release|x64
 		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Release|x64.Build.0 = Release|x64
 		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Release|x86.ActiveCfg = Release|Win32
