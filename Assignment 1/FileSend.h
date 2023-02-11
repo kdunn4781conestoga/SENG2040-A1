@@ -31,7 +31,7 @@ public:
 
 	virtual void Setup();
 	virtual void SetConnected();
-	virtual int GetPacket(char* packet, const int packetSize);
+	virtual char* GetPacket();
 	virtual int ProcessPacket(const char* packet);
 
 	inline State GetState() { return state; }

@@ -46,7 +46,7 @@ void FileSend::SetConnected()
 	state = Sending;
 }
 
-int FileSend::GetPacket(char* packet, const int packetSize)
+char* FileSend::GetPacket()
 {
 	if (state == Sending)
 	{
@@ -56,7 +56,7 @@ int FileSend::GetPacket(char* packet, const int packetSize)
 		{
 			if (file == NULL && !Open("rb"))
 			{
-				return -1;
+				return NULL;
 			}
 
 			fseek(file, currentLength, SEEK_SET);
@@ -77,7 +77,7 @@ int FileSend::GetPacket(char* packet, const int packetSize)
 
 			if (!Close())
 			{
-				return -1;
+				return NULL;
 			}
 
 			lastChunk = chunk;
@@ -97,7 +97,8 @@ int FileSend::GetPacket(char* packet, const int packetSize)
 		}
 
 		chunk->GenerateHeader(filename);
-		chunk->GetPacket(packet, packetSize);
+
+		return chunk->GetPacket();
 	}
 
 	return 0;
@@ -116,7 +117,7 @@ int FileSend::ProcessPacket(const char* packet)
 		{
 			chunk = new FileChunk(-1);
 
-			chunk->ReadPacket(NULL, packet);
+			chunk->ReadPacket(packet);
 
 			if (chunk->HasSucceeded())
 			{
