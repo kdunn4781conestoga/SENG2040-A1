@@ -79,12 +79,13 @@ bool FileChunk::ParseHeader(std::string *filename, int *dataLength, const char* 
 	std::string f;
 
 	int headerLines = 0;
+	int count = 0;
 	std::string line;
 	while (true)
 	{
 		std::getline(ss, line);
 
-		if (line == "\n" || line == "\r")
+		if (count >= MAX_HEADER_LINES || line == "\n" || line == "\r" || line == "\r\n")
 		{
 			break;
 		}
@@ -108,6 +109,7 @@ bool FileChunk::ParseHeader(std::string *filename, int *dataLength, const char* 
 		}
 
 		header += line + "\n";
+		count++;
 	}
 
 	if (filename != NULL)
