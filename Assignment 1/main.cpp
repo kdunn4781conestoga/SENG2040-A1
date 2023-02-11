@@ -29,8 +29,8 @@ const int ServerPort = 30000;
 const int ClientPort = 30001;
 const int ProtocolId = 0x11223344;
 const float DeltaTime = 1.0f / 30.0f;
-const float SendRate = 0.05f;
-const float TimeOut = 10000000.0f;
+const float SendRate = 1.0f / 30.0f;
+const float TimeOut = 10.0f;
 const int PacketSize = 256;
 
 class FlowControl
@@ -125,6 +125,8 @@ private:
 
 // ----------------------------------------------
 
+const int FILENAME_LENGTH = 128;
+
 int main( int argc, char * argv[] )
 {
 	// parse command line
@@ -138,9 +140,12 @@ int main( int argc, char * argv[] )
 	Mode mode = Server;
 	Address address;
 
+	// create instance of FileTransfer class
+	FileTransfer* fileTransfer = NULL;
+
 	// variables for storing filenames
 
-	if ( argc >= 2 )
+	if ( argc >= 3 )
 	{
 		int a,b,c,d;
 		if ( sscanf_s( argv[1], "%d.%d.%d.%d", &a, &b, &c, &d ) )
@@ -149,8 +154,17 @@ int main( int argc, char * argv[] )
 			address = Address(a,b,c,d,ServerPort);
 		}
 
+		char filename[FILENAME_LENGTH];
+		if (sscanf_s(argv[2], "%s", &filename, sizeof(filename)))
+		{
+			fileTransfer = new FileSend((char*)filename);
+		}
+
 		// additional argument parsing for input/output filenames
 	}
+
+	if (mode == Server)
+		fileTransfer = new FileReceive();
 
 	// initialize
 
@@ -181,15 +195,6 @@ int main( int argc, char * argv[] )
 	
 	FlowControl flowControl;
 
-	// create instance of FileTransfer class
-	FileTransfer* fileTransfer = NULL;
-
-	if (mode == Client)
-		fileTransfer = new FileSend("alice29.txt");
-	else
-		fileTransfer = new FileReceive();
-
-	fileTransfer->Setup();
 	// constructor would require the input/output filenames and the mode
 	// if the mode is Client then it will fload() the file storing it in the instance
 	
@@ -215,7 +220,7 @@ int main( int argc, char * argv[] )
 		{
 			printf( "client connected to server\n" );
 			connected = true;
-			fileTransfer->SetConnected();
+			fileTransfer->Setup();
 		}
 		
 		if ( !connected && connection.ConnectFailed() )
