@@ -29,7 +29,6 @@ public:
 	FileReceive();
 
 	virtual void Setup();
-	virtual void SetConnected();
 	virtual char* GetPacket();
 	virtual int ProcessPacket(const char* packet);
 

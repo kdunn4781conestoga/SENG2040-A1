@@ -13,8 +13,16 @@ FileReceive::FileReceive() : FileTransfer("")
 	this->state = Listening;
 }
 
+/*
+	Name	:   Setup
+	Purpose :   this is used to setup the file transfer for receiving
+	Inputs	:	NONE
+	Outputs	:	NONE
+	Returns	:	NONE
+*/
 void FileReceive::Setup()
 {
+	state = Receiving;
 }
 
 /*
@@ -33,6 +41,8 @@ char* FileReceive::GetPacket()
 		{
 			return lastChunk->GetPacket();
 		}
+
+		state = Receiving;
 	}
 
 	return nullptr;

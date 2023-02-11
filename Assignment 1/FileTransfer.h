@@ -24,7 +24,6 @@ public:
 	FileTransfer(const std::string filename);
 	~FileTransfer();
 
-	virtual void SetConnected() = 0;
 	virtual void Setup() = 0;
 	virtual char* GetPacket() = 0;
 	virtual int ProcessPacket(const char* packet) = 0;
