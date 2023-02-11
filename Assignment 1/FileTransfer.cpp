@@ -24,6 +24,13 @@ FileTransfer::~FileTransfer()
 	Close();
 }
 
+/*
+	Name	:   FileTransfer
+	Purpose :   this opens the file for filetransfer
+	Inputs	:	mode	|	const char*	|	the state the system is in
+	Outputs	:	NONE
+	Returns	:	the file
+*/
 bool FileTransfer::Open(const char* mode)
 {
 	fopen_s(&file, filename.c_str(), mode);
@@ -31,6 +38,13 @@ bool FileTransfer::Open(const char* mode)
 	return file != NULL;
 }
 
+/*
+	Name	:   FileTransfer
+	Purpose :   this closes the file for filetransfer
+	Inputs	:	NONE
+	Outputs	:	NONE
+	Returns	:	the file
+*/
 bool FileTransfer::Close()
 {
 	if (fclose(file))

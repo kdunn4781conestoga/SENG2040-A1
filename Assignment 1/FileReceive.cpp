@@ -13,11 +13,25 @@ FileReceive::FileReceive() : FileTransfer("")
 	this->state = Listening;
 }
 
+/*
+	Name	:   Setup
+	Purpose :   this is used to setup the file transfer for receiving
+	Inputs	:	NONE
+	Outputs	:	NONE
+	Returns	:	NONE
+*/
 void FileReceive::Setup()
 {
 	state = Receiving;
 }
 
+/*
+	Name	:   GetPacket
+	Purpose :   this is used to receive the packet
+	Inputs	:	packet	|	const char*		|	the packet
+	Outputs	:	NONE
+	Returns	:	nullptr	|	pointer to the packet
+*/
 char* FileReceive::GetPacket()
 {
 	if (state == Sending)
@@ -34,6 +48,13 @@ char* FileReceive::GetPacket()
 	return nullptr;
 }
 
+/*
+	Name	:   ProcessPacket
+	Purpose :   this is used to process the packet
+	Inputs	:	packet	|	const char*		|	the packet
+	Outputs	:	NONE
+	Returns	:	int
+*/
 int FileReceive::ProcessPacket(const char* packet)
 {
 	if (state == Receiving)
