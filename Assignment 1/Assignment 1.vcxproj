@@ -33,12 +33,14 @@
     <ClCompile Include="FileTransfer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SimpleProtocol.cpp" />
+    <ClCompile Include="FileValidator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileChunk.h" />
     <ClInclude Include="FileReceive.h" />
     <ClInclude Include="FileSend.h" />
     <ClInclude Include="FileTransfer.h" />
+    <ClInclude Include="FileValidator.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="SimpleProtocol.h" />
   </ItemGroup>
