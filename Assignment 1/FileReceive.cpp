@@ -19,7 +19,7 @@ void FileReceive::Setup()
 
 /*
 	Name	:   GetPacket
-	Purpose :   this is used to read the full packet
+	Purpose :   this is used to receive the packet
 	Inputs	:	packet	|	const char*		|	the packet
 	Outputs	:	NONE
 	Returns	:	nullptr	|	pointer to the packet
@@ -38,6 +38,13 @@ char* FileReceive::GetPacket()
 	return nullptr;
 }
 
+/*
+	Name	:   ProcessPacket
+	Purpose :   this is used to process the packet
+	Inputs	:	packet	|	const char*		|	the packet
+	Outputs	:	NONE
+	Returns	:	int
+*/
 int FileReceive::ProcessPacket(const char* packet)
 {
 	if (state == Receiving)
