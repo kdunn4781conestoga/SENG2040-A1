@@ -15,10 +15,6 @@ FileReceive::FileReceive() : FileTransfer("")
 
 void FileReceive::Setup()
 {
-}
-
-void FileReceive::SetConnected()
-{
 	state = Receiving;
 }
 
@@ -31,6 +27,8 @@ char* FileReceive::GetPacket()
 		{
 			return lastChunk->GetPacket();
 		}
+
+		state = Receiving;
 	}
 
 	return nullptr;
