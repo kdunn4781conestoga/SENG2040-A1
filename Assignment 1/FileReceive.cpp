@@ -17,11 +17,13 @@ void FileReceive::Setup()
 {
 }
 
-void FileReceive::SetConnected()
-{
-	state = Receiving;
-}
-
+/*
+	Name	:   GetPacket
+	Purpose :   this is used to read the full packet
+	Inputs	:	packet	|	const char*		|	the packet
+	Outputs	:	NONE
+	Returns	:	nullptr	|	pointer to the packet
+*/
 char* FileReceive::GetPacket()
 {
 	if (state == Sending)

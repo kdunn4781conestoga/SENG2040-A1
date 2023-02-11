@@ -22,6 +22,13 @@ FileChunk::~FileChunk()
 	
 }
 
+/*
+	Name	:   ReadPacket
+	Purpose :   this is used to read the full packet
+	Inputs	:	packet	|	const char*		|	the packet
+	Outputs	:	NONE
+	Returns	:	True | False
+*/
 bool FileChunk::ReadPacket(const char* packet)
 {
 	succeeded = false;
@@ -49,6 +56,13 @@ bool FileChunk::ReadPacket(const char* packet)
 	return true;
 }
 
+/*
+	Name	:   AppendData
+	Purpose :   this is used to append the data
+	Inputs	:	data	|	const char*		|	the data being sent
+	Outputs	:	NONE
+	Returns	:	True | False
+*/
 bool FileChunk::AppendData(const char data)
 {
 	// doesn't append data if it's going to go over chunk size
@@ -62,6 +76,14 @@ bool FileChunk::AppendData(const char data)
 	return true;
 }
 
+
+/*
+	Name	:   GenerateHeader
+	Purpose :   this is used to generate the header
+	Inputs	:	filename	|	 string		|	gets the filename to add to the header
+	Outputs	:	NONE
+	Returns	:	NONE
+*/
 void FileChunk::GenerateHeader(std::string filename)
 {
 	// generates the header
@@ -73,6 +95,15 @@ void FileChunk::GenerateHeader(std::string filename)
 	header = ss.str();
 }
 
+
+/*
+	Name	:   ParseHeader
+	Purpose :   this is used to parse the header  
+	Inputs	:	datalength	|	int*			|	pointer to the length of the data
+				packet		|	const char*		|	the packet
+	Outputs	:	NONE
+	Returns	:	True | False
+*/
 bool FileChunk::ParseHeader(int *dataLength, const char* packet)
 {
 	std::stringstream ss(packet);
@@ -114,6 +145,14 @@ bool FileChunk::ParseHeader(int *dataLength, const char* packet)
 	return headerLines >= 3;
 }
 
+
+/*
+	Name	:   GetPacket
+	Purpose :   this is used to get the packet info
+	Inputs	:	NONE
+	Outputs	:	NONE
+	Returns	:	packet	|	returns the pointer to the packet
+*/
 char* FileChunk::GetPacket()
 {
 	if (header.empty())

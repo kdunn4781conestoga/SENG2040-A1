@@ -14,6 +14,13 @@ FileSend::FileSend(const char* filename) : FileTransfer(filename)
 	this->currentIndex = 0;
 }
 
+/*
+	Name	:   Setup
+	Purpose :   this is used to setup for file transfer
+	Inputs	:	NONE
+	Outputs	:	NONE
+	Returns	:	NONE
+*/
 void FileSend::Setup()
 {
 	this->state = Sending;
@@ -41,6 +48,13 @@ void FileSend::Setup()
 	file = NULL;
 }
 
+/*
+	Name	:   SetConnected
+	Purpose :   this is used to set the connection to sending
+	Inputs	:	NONE
+	Outputs	:	NONE
+	Returns	:	NONE
+*/
 void FileSend::SetConnected()
 {
 	state = Sending;
@@ -104,6 +118,13 @@ char* FileSend::GetPacket()
 	return 0;
 }
 
+/*
+	Name	:   ProcessPacket
+	Purpose :   this is used to process 
+	Inputs	:	packet	|	const char*	|	the packet
+	Outputs	:	NONE
+	Returns	:	int
+*/
 int FileSend::ProcessPacket(const char* packet)
 {
 	if (state == Receiving)

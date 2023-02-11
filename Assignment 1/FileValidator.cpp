@@ -8,6 +8,14 @@
 
 #include "FileValidator.h"
 
+/*
+    Name	:   Fletcher16
+    Purpose :   this is a copy of John Fletchers checksum algo.
+    Inputs	:	data	|	uint8_t	|	the packet
+                length  |   int     |   the length of the packet
+    Outputs	:	NONE
+    Returns	:	the checksum value
+*/
 uint16_t Fletcher16(uint8_t* data, int length)
 {
     uint16_t sum1 = 0;
