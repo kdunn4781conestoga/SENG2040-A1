@@ -9,14 +9,14 @@
 #include "FileTransfer.h"
 
 
-FileTransfer::FileTransfer(const char* filename)
+FileTransfer::FileTransfer(const std::string filename)
 {
 	this->file = NULL;
 	this->currentLength = 0;
 	this->totalLength = 0;
-	this->filename = (char*)filename;
+	this->filename = filename;
 	this->currentIndex = -1;
-	this->lastIndex = -1;
+	this->lastChunk = NULL;
 }
 
 FileTransfer::~FileTransfer()
@@ -24,9 +24,9 @@ FileTransfer::~FileTransfer()
 	Close();
 }
 
-bool FileTransfer::Open()
+bool FileTransfer::Open(const char* mode)
 {
-	fopen_s(&file, filename, "rb");
+	fopen_s(&file, filename.c_str(), mode);
 
 	return file != NULL;
 }

@@ -22,37 +22,122 @@ FileChunk::~FileChunk()
 	
 }
 
-void FileChunk::ReadPacket(const char* packet)
+bool FileChunk::ReadPacket(std::string *filename, const char* packet)
 {
+	succeeded = false;
+
+	if (packet == NULL || strcmp(packet, "") == 0) return false;
+
+	int dataLength = -1;
+	if (!ParseHeader(filename, &dataLength, packet))
+	{
+		return false;
+	}
+
+	char* cPos = (char*)packet + header.size();
+	while (data.size() < dataLength)
+	{
+		AppendData(*cPos);
+
+		cPos++;
+	}
+
+	succeeded = true;
+
+	return true;
 }
 
 bool FileChunk::AppendData(const char data)
 {
 	// doesn't append data if it's going to go over chunk size
-	if (this->data.size() + 1 >= CHUNK_SIZE)
+	if (this->data.size() + 1 > CHUNK_SIZE)
 	{
 		return false;
 	}
 
 	this->data.push_back(data);
+	dataLength++;
 
 	return true;
 }
 
-void FileChunk::GenerateHeader()
+void FileChunk::GenerateHeader(std::string filename)
 {
 	// generates the header
+	std::stringstream ss;
+	ss << "FILENAME: " << filename << std::endl;
+	ss << "INDEX: " << index << std::endl;
+	ss << "LENGTH: " << GetLength() << std::endl;
+
+	header = ss.str();
 }
 
-char* FileChunk::GetPacket()
+bool FileChunk::ParseHeader(std::string *filename, int *dataLength, const char* packet)
 {
-	// combines the header and packet
-	char packet[256] = { 0 };
+	std::stringstream ss(packet);
 
-	for (int i = 0; i < data.size(); i++)
+	std::string f;
+
+	int headerLines = 0;
+	std::string line;
+	while (true)
 	{
-		packet[i] = data[i];
+		std::getline(ss, line);
+
+		if (line == "\n" || line == "\r")
+		{
+			break;
+		}
+
+		if (f.empty() && line.rfind("FILENAME: ", 0) == 0)
+		{
+			f = line.substr(10);
+			headerLines++;
+		}
+
+		if (*dataLength == -1 && line.rfind("LENGTH: ", 0) == 0)
+		{
+			*dataLength = std::stol(line.substr(8));
+			headerLines++;
+		}
+
+		if (index == -1 && line.rfind("INDEX: ", 0) == 0)
+		{
+			index = std::stoi(line.substr(7));
+			headerLines++;
+		}
+
+		header += line + "\n";
 	}
 
-	return packet;
+	if (filename != NULL)
+	{
+		*filename = "test-" + f;
+	}
+
+	return headerLines >= 3;
+}
+
+int FileChunk::GetPacket(char* packet, const int packetSize)
+{
+	if (header.empty() || data.empty())
+	{
+		return -1;
+	}
+
+	// combines the header and packet
+	strcat_s(packet, packetSize, header.c_str());
+	strcat_s(packet, packetSize, "\n");
+
+	for (int i = 0; i < dataLength; i++)
+	{
+		packet[i + header.size()] = data[i];
+	}
+
+	return 0;
+}
+
+std::vector<char> FileChunk::GetData()
+{
+	return data;
 }
