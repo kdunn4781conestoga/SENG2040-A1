@@ -8,21 +8,80 @@
 
 #include "FileReceive.h"
 
-FileReceive::FileReceive() : FileTransfer(NULL)
+FileReceive::FileReceive() : FileTransfer("")
 {
 	this->state = Listening;
 }
 
 void FileReceive::Setup()
 {
+	state = Receiving;
 }
 
-char* FileReceive::GetPacket()
+void FileReceive::SetConnected()
 {
-	return nullptr;
+	state = Receiving;
+}
+
+int FileReceive::GetPacket(char* packet, const int packetSize)
+{
+	if (state == Sending)
+	{
+		// send packet information
+		if (lastChunk != NULL)
+		{
+			lastChunk->GetPacket(packet, packetSize);
+			memset(packet, 0, sizeof(packet));
+		}
+
+		state = Receiving;
+	}
+
+	return 0;
 }
 
 int FileReceive::ProcessPacket(const char* packet)
 {
-	return 0;
+	if (state == Receiving)
+	{
+		if (packet == NULL || strcmp(packet, "") == 0)
+		{
+			lastChunk = new FileChunk(-1);
+		}
+		else
+		{
+			FileChunk* chunk = new FileChunk(-1);
+			chunk->ReadPacket(&filename, packet);
+
+			if (chunk->HasSucceeded())
+			{
+				Open("wb");
+
+				fseek(file, currentLength, SEEK_SET);
+
+				std::vector<char> data = chunk->GetData();
+
+				for (int i = 0; i < data.size(); i++)
+				{
+					fwrite(&data[i], 1, 1, file);
+				}
+
+				Close();
+
+				currentLength += CHUNK_SIZE;
+
+				lastChunk = chunk;
+			}
+			else
+			{
+				lastChunk = new FileChunk(-1);
+			}
+		}
+
+		state = Sending;
+
+		return 0;
+	}
+
+	return -1;
 }

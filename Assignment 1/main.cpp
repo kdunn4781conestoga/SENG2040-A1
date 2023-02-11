@@ -29,8 +29,8 @@ const int ServerPort = 30000;
 const int ClientPort = 30001;
 const int ProtocolId = 0x11223344;
 const float DeltaTime = 1.0f / 30.0f;
-const float SendRate = 1.0f / 30.0f;
-const float TimeOut = 10.0f;
+const float SendRate = 0.05f;
+const float TimeOut = 10000000.0f;
 const int PacketSize = 256;
 
 class FlowControl
@@ -189,7 +189,6 @@ int main( int argc, char * argv[] )
 	else
 		fileTransfer = new FileReceive();
 
-	fileTransfer->Setup();
 	// constructor would require the input/output filenames and the mode
 	// if the mode is Client then it will fload() the file storing it in the instance
 	
@@ -215,6 +214,13 @@ int main( int argc, char * argv[] )
 		{
 			printf( "client connected to server\n" );
 			connected = true;
+			fileTransfer->Setup();
+		}
+
+		if (mode == Client && connected && ((FileSend*)fileTransfer)->GetState() == FileSend::Disconnecting)
+		{
+			printf("transfer complete\n");
+			break;
 		}
 		
 		if ( !connected && connection.ConnectFailed() )
@@ -233,10 +239,7 @@ int main( int argc, char * argv[] )
 			unsigned char packet[PacketSize];
 			memset( packet, 0, sizeof( packet ) );
 
-			char* filePacket = fileTransfer->GetPacket();
-
-			if (filePacket != NULL)
-				strcpy_s((char*)packet, PacketSize, filePacket);
+			fileTransfer->GetPacket((char*)packet, PacketSize);
 
 			// CLIENT
 			// check if any packets need to be resent
@@ -251,7 +254,7 @@ int main( int argc, char * argv[] )
 			// checks to see if any packets were received from FileTransfer
 			// calls FileTransfer function to get a packet to send back to the client
 			// that confirms the packet was sent
-			connection.SendPacket( packet, sizeof( packet ) );
+			connection.SendPacket(packet, sizeof( packet ) );
 			sendAccumulator -= 1.0f / sendRate;
 		}
 		
@@ -262,7 +265,10 @@ int main( int argc, char * argv[] )
 			int bytes_read = connection.ReceivePacket( packet, sizeof(packet) );
 			if ( bytes_read == 0 )
 				break;
-			//else
+			else
+			{
+				fileTransfer->ProcessPacket((char*)packet);
+			}
 			// 
 			// CLIENT
 			// here it checks for the server's return message

@@ -11,8 +11,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
+#include <sstream>
 
-#define CHUNK_SIZE 128
+#define CHUNK_SIZE 64
+#define HEADER_SIZE 64
 
 class FileChunk
 {
@@ -20,17 +22,22 @@ public:
 	FileChunk(int index);
 	~FileChunk();
 
-	void ReadPacket(const char* packet);
+	bool ReadPacket(std::string *filename, const char* packet);
 	bool AppendData(const char data);
-	char* GetPacket();
+	int GetPacket(char* packet, const int packetSize);
+	std::vector<char> GetData();
+	void GenerateHeader(std::string filename);
 
-	inline int GetLength() { return data.size(); }
-protected:
-	void GenerateHeader();
+	inline int GetLength() { return data.size() + header.length(); }
+	inline int GetIndex() { return index; }
+	inline bool HasSucceeded() { return succeeded; }
 private:
+	bool ParseHeader(std::string* filename, int* dataLength, const char* packet);
+
 	int index;
 	std::string header;
 	std::vector<char> data;
+	int dataLength;
 
 	bool succeeded;
 };

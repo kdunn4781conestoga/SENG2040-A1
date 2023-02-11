@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <list>
-#include <vector>
 
 #include "FileChunk.h"
 
@@ -22,25 +21,28 @@
 class FileTransfer
 {
 public:
-	FileTransfer(const char* filename);
+	FileTransfer(const std::string filename);
 	~FileTransfer();
 
+	virtual void SetConnected() = 0;
 	virtual void Setup() = 0;
-	virtual char* GetPacket() = 0;
+	virtual int GetPacket(char* packet, const int packetSize) = 0;
 	virtual int ProcessPacket(const char* packet) = 0;
 protected:
-	bool Open();
+	bool Open(const char* mode);
 	bool Close();
 
-	char* filename;
+	std::string filename;
 
 	FILE* file;
 
 	long currentLength;
 	long totalLength;
 
-	int lastIndex;
 	int currentIndex;
+
+	FileChunk* lastChunk;
+	FileChunk* currentChunk;
 
 	std::list<FileChunk> chunks;
 };

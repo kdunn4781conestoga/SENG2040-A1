@@ -11,12 +11,16 @@
 FileSend::FileSend(const char* filename) : FileTransfer(filename)
 {
 	this->state = Disconnected;
+	this->currentIndex = 0;
 }
 
 void FileSend::Setup()
 {
+	this->state = Sending;
+	this->currentIndex = 0;
+
 	// opens file
-	fopen_s(&file, filename, "rb");
+	fopen_s(&file, filename.c_str(), "rb");
 
 	if (file == NULL)
 	{
@@ -37,41 +41,95 @@ void FileSend::Setup()
 	file = NULL;
 }
 
-char* FileSend::GetPacket()
+void FileSend::SetConnected()
 {
-	if (file == NULL && !Open())
+	state = Sending;
+}
+
+int FileSend::GetPacket(char* packet, const int packetSize)
+{
+	if (state == Sending)
 	{
-		return nullptr;
-	}
+		FileChunk* chunk = NULL;
 
-	fseek(file, currentLength, SEEK_SET);
-
-	if (currentLength == 0)
-		currentIndex = 0;
-
-	FileChunk* chunk = new FileChunk(currentIndex);
-
-	char buffer[2] = { 0 };
-	while (fread(buffer, 1, 1, file) != 0) {
-		chunk->AppendData(buffer[0]);
-
-		if (chunk->GetLength() > CHUNK_SIZE)
+		if (lastChunk == NULL || currentIndex != lastChunk->GetIndex())
 		{
-			break;
+			if (file == NULL && !Open("rb"))
+			{
+				return -1;
+			}
+
+			fseek(file, currentLength, SEEK_SET);
+
+			chunk = new FileChunk(currentIndex);
+
+			char buffer[2] = { 0 };
+			while (fread(buffer, 1, 1, file) != 0) {
+				chunk->AppendData(buffer[0]);
+
+				if (chunk->GetData().size() > CHUNK_SIZE)
+				{
+					break;
+				}
+			}
+
+			currentLength += chunk->GetData().size(); // keeps track of where in the file it stopped at
+
+			if (!Close())
+			{
+				return -1;
+			}
+
+			lastChunk = chunk;
 		}
+		else
+		{
+			chunk = lastChunk;
+		}
+
+		if (currentLength >= totalLength)
+		{
+			state = Disconnecting;
+		}
+		else
+		{
+			state = Receiving;
+		}
+
+		chunk->GenerateHeader(filename);
+		chunk->GetPacket(packet, packetSize);
 	}
 
-	currentLength += chunk->GetLength(); // keeps track of where in the file it stopped at
-
-	if (!Close())
-	{
-		return nullptr;
-	}
-
-	return chunk->GetPacket();
+	return 0;
 }
 
 int FileSend::ProcessPacket(const char* packet)
 {
+	if (state == Receiving)
+	{
+		FileChunk* chunk = NULL;
+		if (packet == NULL || strcmp(packet, "") == 0)
+		{
+			lastChunk = new FileChunk(-1);
+		}
+		else
+		{
+			chunk = new FileChunk(-1);
+
+			chunk->ReadPacket(NULL, packet);
+
+			if (chunk->HasSucceeded())
+			{
+				currentIndex++;
+			}
+		}
+
+		lastChunk = chunk;
+
+		state = Sending;
+
+		return 0;
+	}
+
 	return 0;
 }
