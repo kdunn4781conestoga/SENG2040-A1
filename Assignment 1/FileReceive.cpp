@@ -31,10 +31,9 @@ int FileReceive::GetPacket(char* packet, const int packetSize)
 		if (lastChunk != NULL)
 		{
 			lastChunk->GetPacket(packet, packetSize);
-			memset(packet, 0, sizeof(packet));
-		}
 
-		state = Receiving;
+			state = Receiving;
+		}
 	}
 
 	return 0;

@@ -15,6 +15,7 @@
 
 #define CHUNK_SIZE 64
 #define HEADER_SIZE 64
+#define MAX_HEADER_LINES 5
 
 class FileChunk
 {

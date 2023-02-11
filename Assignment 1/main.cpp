@@ -29,7 +29,7 @@ const int ServerPort = 30000;
 const int ClientPort = 30001;
 const int ProtocolId = 0x11223344;
 const float DeltaTime = 1.0f / 30.0f;
-const float SendRate = 0.05f;
+const float SendRate = 1.0f / 30.0f;
 const float TimeOut = 10000000.0f;
 const int PacketSize = 256;
 
@@ -239,7 +239,7 @@ int main( int argc, char * argv[] )
 			unsigned char packet[PacketSize];
 			memset( packet, 0, sizeof( packet ) );
 
-			fileTransfer->GetPacket((char*)packet, PacketSize);
+			fileTransfer->GetPacket((char*)packet, sizeof(packet));
 
 			// CLIENT
 			// check if any packets need to be resent
