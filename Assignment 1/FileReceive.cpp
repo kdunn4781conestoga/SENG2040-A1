@@ -15,7 +15,6 @@ FileReceive::FileReceive() : FileTransfer("")
 
 void FileReceive::Setup()
 {
-	state = Receiving;
 }
 
 void FileReceive::SetConnected()
@@ -23,20 +22,18 @@ void FileReceive::SetConnected()
 	state = Receiving;
 }
 
-int FileReceive::GetPacket(char* packet, const int packetSize)
+char* FileReceive::GetPacket()
 {
 	if (state == Sending)
 	{
 		// send packet information
 		if (lastChunk != NULL)
 		{
-			lastChunk->GetPacket(packet, packetSize);
-
-			state = Receiving;
+			return lastChunk->GetPacket();
 		}
 	}
 
-	return 0;
+	return nullptr;
 }
 
 int FileReceive::ProcessPacket(const char* packet)
@@ -50,7 +47,7 @@ int FileReceive::ProcessPacket(const char* packet)
 		else
 		{
 			FileChunk* chunk = new FileChunk(-1);
-			chunk->ReadPacket(&filename, packet);
+			chunk->ReadPacket(packet);
 
 			if (chunk->HasSucceeded())
 			{

@@ -26,7 +26,7 @@ public:
 
 	virtual void SetConnected() = 0;
 	virtual void Setup() = 0;
-	virtual int GetPacket(char* packet, const int packetSize) = 0;
+	virtual char* GetPacket() = 0;
 	virtual int ProcessPacket(const char* packet) = 0;
 protected:
 	bool Open(const char* mode);

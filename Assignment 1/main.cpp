@@ -29,7 +29,7 @@ const int ServerPort = 30000;
 const int ClientPort = 30001;
 const int ProtocolId = 0x11223344;
 const float DeltaTime = 1.0f / 30.0f;
-const float SendRate = 1.0f / 30.0f;
+const float SendRate = 0.05f;
 const float TimeOut = 10000000.0f;
 const int PacketSize = 256;
 
@@ -189,6 +189,7 @@ int main( int argc, char * argv[] )
 	else
 		fileTransfer = new FileReceive();
 
+	fileTransfer->Setup();
 	// constructor would require the input/output filenames and the mode
 	// if the mode is Client then it will fload() the file storing it in the instance
 	
@@ -214,13 +215,7 @@ int main( int argc, char * argv[] )
 		{
 			printf( "client connected to server\n" );
 			connected = true;
-			fileTransfer->Setup();
-		}
-
-		if (mode == Client && connected && ((FileSend*)fileTransfer)->GetState() == FileSend::Disconnecting)
-		{
-			printf("transfer complete\n");
-			break;
+			fileTransfer->SetConnected();
 		}
 		
 		if ( !connected && connection.ConnectFailed() )
@@ -236,10 +231,15 @@ int main( int argc, char * argv[] )
 		// sending packets
 		while ( sendAccumulator > 1.0f / sendRate )
 		{
-			unsigned char packet[PacketSize];
+			char packet[PacketSize];
 			memset( packet, 0, sizeof( packet ) );
 
-			fileTransfer->GetPacket((char*)packet, sizeof(packet));
+			char* filePacket = fileTransfer->GetPacket();
+
+			if (filePacket != NULL)
+			{
+				strcpy_s(packet, PacketSize, filePacket);
+			}
 
 			// CLIENT
 			// check if any packets need to be resent
@@ -254,20 +254,20 @@ int main( int argc, char * argv[] )
 			// checks to see if any packets were received from FileTransfer
 			// calls FileTransfer function to get a packet to send back to the client
 			// that confirms the packet was sent
-			connection.SendPacket(packet, sizeof( packet ) );
+			connection.SendPacket((unsigned char*)packet, sizeof( packet ) );
 			sendAccumulator -= 1.0f / sendRate;
 		}
 		
 		// receiving packets
 		while ( true )
 		{
-			unsigned char packet[256];
-			int bytes_read = connection.ReceivePacket( packet, sizeof(packet) );
+			char packet[256];
+			int bytes_read = connection.ReceivePacket((unsigned char*)packet, sizeof(packet) );
 			if ( bytes_read == 0 )
 				break;
 			else
 			{
-				fileTransfer->ProcessPacket((char*)packet);
+				fileTransfer->ProcessPacket(packet);
 			}
 			// 
 			// CLIENT
