@@ -1,5 +1,5 @@
 /*
-* FILE			: FileSend.h
+* FILE			: FileClient.h
 * PROJECT		: Assignment 1
 * PROGRAMMERS	: Kyle Dunn & David Czachor
 * FIRST VERSION : 2023-01-31
@@ -11,10 +11,10 @@
 #include "FileTransfer.h"
 
 /*
-* CLASS    : FileSend
+* CLASS    : FileClient
 * PURPOSE  : This class handles sending files between connections
 */
-class FileSend : public FileTransfer
+class FileClient : public FileTransfer
 {
 public:
 	enum State
@@ -24,21 +24,20 @@ public:
 		Connected,
 		Sending,
 		Receiving,
+		Validating,
 		Disconnecting
 	};
 
-	FileSend(const char* filename);
+	FileClient(const char* filename);
 
-	virtual void Setup();
-	virtual void SetConnected();
+	virtual void Initialize();
 	virtual char* GetPacket();
-	virtual int ProcessPacket(const char* packet);
+	virtual int ParsePacket(const char* packet);
+	virtual int ProcessPacket();
 
 	inline State GetState() { return state; }
 
 private:
-	int currentIndex;
-
 	State state;
 };
 

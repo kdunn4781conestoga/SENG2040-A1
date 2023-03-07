@@ -28,17 +28,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileChunk.cpp" />
-    <ClCompile Include="FileReceive.cpp" />
-    <ClCompile Include="FileSend.cpp" />
+    <ClCompile Include="FileServer.cpp" />
+    <ClCompile Include="FileClient.cpp" />
     <ClCompile Include="FileTransfer.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="SimpleProtocol.cpp" />
     <ClCompile Include="FileValidator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileChunk.h" />
-    <ClInclude Include="FileReceive.h" />
-    <ClInclude Include="FileSend.h" />
+    <ClInclude Include="FileServer.h" />
+    <ClInclude Include="FileClient.h" />
     <ClInclude Include="FileTransfer.h" />
     <ClInclude Include="FileValidator.h" />
     <ClInclude Include="Net.h" />

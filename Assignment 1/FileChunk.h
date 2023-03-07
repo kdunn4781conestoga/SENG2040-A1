@@ -13,29 +13,32 @@
 #include <vector>
 #include <sstream>
 
+#include "SimpleProtocol.h"
+
 #define CHUNK_SIZE 128
-#define HEADER_SIZE 64
+#define HEADER_SIZE 100
+#define MAX_HEADER_LINES 5
 
 class FileChunk
 {
 public:
-	FileChunk(int index);
+	FileChunk();
 	~FileChunk();
 
 	bool ReadPacket(const char* packet);
 	bool AppendData(const char data);
 	char* GetPacket();
-	void GenerateHeader(std::string filename);
+	void CreateHeader(std::string filename, long filesize, int index, const char *checksum = NULL);
+	std::string GenerateHeader();
 
-	inline int GetLength() { return data.size() + header.length(); }
-	inline int GetIndex() { return index; }
+	inline int GetIndex() { return header.index; }
 	inline bool HasSucceeded() { return succeeded; }
+	inline SimpleProtocol GetHeader(){ return (const SimpleProtocol)header; }
 	inline std::vector<char> GetData() { return data; }
 private:
 	bool ParseHeader(int* dataLength, const char* packet);
 
-	int index;
-	std::string header;
+	SimpleProtocol header;
 	std::vector<char> data;
 
 	bool succeeded;

@@ -16,7 +16,9 @@ FileTransfer::FileTransfer(const std::string filename)
 	this->totalLength = 0;
 	this->filename = filename;
 	this->currentIndex = -1;
-	this->lastChunk = NULL;
+	this->lastIndex = -1;
+	this->connected = false;
+	this->finished = false;
 }
 
 FileTransfer::~FileTransfer()

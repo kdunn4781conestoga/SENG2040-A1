@@ -17,8 +17,8 @@
 #include <vector>
 
 #include "Net.h"
-#include "FileSend.h"
-#include "FileReceive.h"
+#include "FileClient.h"
+#include "FileServer.h"
 
 //#define SHOW_ACKS
 
@@ -28,8 +28,8 @@ using namespace net;
 const int ServerPort = 30000;
 const int ClientPort = 30001;
 const int ProtocolId = 0x11223344;
-const float DeltaTime = 1.0f / 30.0f;
-const float SendRate = 1.0f / 30.0f;
+const float DeltaTime = 1.0f / 90.0f; //1.0f / 30.0f;
+const float SendRate = 1.0f / 90.0f; //1.0f / 30.0f;
 const float TimeOut = 10.0f;
 const int PacketSize = 256;
 
@@ -157,14 +157,12 @@ int main( int argc, char * argv[] )
 		char filename[FILENAME_LENGTH];
 		if (sscanf_s(argv[2], "%s", &filename, sizeof(filename)))
 		{
-			fileTransfer = new FileSend((char*)filename);
+			fileTransfer = new FileClient((char*)filename);
 		}
-
-		// additional argument parsing for input/output filenames
 	}
 
 	if (mode == Server)
-		fileTransfer = new FileReceive();
+		fileTransfer = new FileServer();
 
 	// initialize
 
@@ -220,7 +218,7 @@ int main( int argc, char * argv[] )
 		{
 			printf( "client connected to server\n" );
 			connected = true;
-			fileTransfer->Setup();
+			fileTransfer->Initialize();
 		}
 		
 		if ( !connected && connection.ConnectFailed() )
@@ -228,6 +226,15 @@ int main( int argc, char * argv[] )
 			printf( "connection failed\n" );
 			break;
 		}
+
+		if (fileTransfer->IsFinished())
+		{
+			printf("file transfer completed\n");
+			connection.Stop();
+			break;
+		}
+
+		fileTransfer->SetConnected(connected);
 		
 		// send and receive packets
 		
@@ -243,7 +250,7 @@ int main( int argc, char * argv[] )
 
 			if (filePacket != NULL)
 			{
-				strcpy_s(packet, PacketSize, filePacket);
+				strncpy_s(packet, PacketSize, filePacket, _TRUNCATE);
 			}
 
 			// CLIENT
@@ -272,7 +279,7 @@ int main( int argc, char * argv[] )
 				break;
 			else
 			{
-				fileTransfer->ProcessPacket(packet);
+				fileTransfer->ParsePacket(packet);
 			}
 			// 
 			// CLIENT
@@ -330,6 +337,9 @@ int main( int argc, char * argv[] )
 			
 			statsAccumulator -= 0.25f;
 		}
+
+		// process packets
+		fileTransfer->ProcessPacket();
 
 		net::wait( DeltaTime );
 	}

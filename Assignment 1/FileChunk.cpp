@@ -8,18 +8,15 @@
 
 #include "FileChunk.h"
 
-FileChunk::FileChunk(int index)
+FileChunk::FileChunk()
 {
-	this->index = index;
-	this->header = "";
+	this->header = SimpleProtocol();
 	this->data = std::vector<char>();
-
 	this->succeeded = false;
 }
 
 FileChunk::~FileChunk()
 {
-	
 }
 
 /*
@@ -41,14 +38,22 @@ bool FileChunk::ReadPacket(const char* packet)
 		return false;
 	}
 
-	std::cout << "Header: "<< std::endl << packet << std::endl << std::endl;
+	//std::cout << "Header: "<< std::endl << packet << std::endl << std::endl;
 
-	char* cPos = (char*)packet + header.size();
-	while (data.size() >= dataLength)
+	if (header.checksum != NULL)
+	{
+		printf("End?\n");
+	}
+
+	char* cPos = (char*)packet + GenerateHeader().size() + 1;
+	while (true)
 	{
 		AppendData(*cPos);
 
-		cPos++;
+		if (data.size() >= dataLength)
+			break;
+		else
+			cPos++;
 	}
 
 	succeeded = true;
@@ -66,7 +71,7 @@ bool FileChunk::ReadPacket(const char* packet)
 bool FileChunk::AppendData(const char data)
 {
 	// doesn't append data if it's going to go over chunk size
-	if (this->data.size() + 1 >= CHUNK_SIZE)
+	if (this->data.size() + 1 > CHUNK_SIZE)
 	{
 		return false;
 	}
@@ -78,21 +83,67 @@ bool FileChunk::AppendData(const char data)
 
 
 /*
-	Name	:   GenerateHeader
-	Purpose :   this is used to generate the header
+	Name	:   CreateHeader
+	Purpose :   this is used to create the header
 	Inputs	:	filename	|	 string		|	gets the filename to add to the header
 	Outputs	:	NONE
 	Returns	:	NONE
 */
-void FileChunk::GenerateHeader(std::string filename)
+void FileChunk::CreateHeader(std::string filename, long filesize, int index, const char* checksum)
+{
+	header.filename = filename;
+	header.filesize = filesize;
+	header.index = index;
+	header.length = data.size();
+
+	if (checksum != NULL)
+	{
+		header.checksum = (char*)malloc(strlen(checksum) + 1);
+		if (header.checksum != NULL)
+		{
+			strcpy_s(header.checksum, strlen(checksum) + 1, checksum);
+		}
+	}
+}
+
+/*
+	Name	:   GenerateHeader
+	Purpose :   this is used to generate the header
+	Inputs	:	NONE
+	Outputs	:	NONE
+	Returns	:	NONE
+*/
+std::string FileChunk::GenerateHeader()
 {
 	// generates the header
 	std::stringstream ss;
-	ss << "FILENAME: " << filename << std::endl;
-	ss << "INDEX: " << index << std::endl;
-	ss << "LENGTH: " << GetLength() << std::endl;
+	if (!this->header.filename.empty())
+	{
+		ss << "FILENAME: " << this->header.filename << std::endl;
+	}
 
-	header = ss.str();
+	if (this->header.filesize != -1)
+	{
+		ss << "FILESIZE: " << this->header.filesize << std::endl;
+	}
+
+	if (this->header.index != -1)
+	{
+		ss << "INDEX: " << this->header.index << std::endl;
+	}
+
+	if (this->header.length != -1)
+	{
+		ss << "LENGTH: " << this->header.length << std::endl;
+	}
+
+	// sends checksum to indicate that it's the end of the file transfer
+	if (this->header.checksum != NULL)
+	{
+		ss << "CHECKSUM: " << this->header.checksum << std::endl;
+	}
+
+	return ss.str();
 }
 
 
@@ -108,41 +159,52 @@ bool FileChunk::ParseHeader(int *dataLength, const char* packet)
 {
 	std::stringstream ss(packet);
 
-	std::string filename;
-
 	int headerLines = 0;
 	std::string line;
 	while (true)
 	{
 		std::getline(ss, line);
 
-		if (line == "\n" || line == "\r")
+		if (line == "" || headerLines >= MAX_HEADER_LINES)
 		{
 			break;
 		}
 
-		if (filename.empty() && line.rfind("FILENAME: ", 0) == 0)
+		if (line.rfind("FILENAME: ", 0) == 0)
 		{
-			filename = line.substr(10);
-			headerLines++;
+			header.filename = line.substr(10);
+		}
+
+		if (line.rfind("FILESIZE: ", 0) == 0)
+		{
+			header.filesize = std::stol(line.substr(10));
+		}
+
+		if (line.rfind("INDEX: ", 0) == 0)
+		{
+			header.index = std::stoi(line.substr(7));
 		}
 
 		if (*dataLength == -1 && line.rfind("LENGTH: ", 0) == 0)
 		{
 			*dataLength = std::stol(line.substr(8));
-			headerLines++;
+			header.length = *dataLength;
 		}
 
-		if (index == -1 && line.rfind("INDEX: ", 0) == 0)
+		if (line.rfind("CHECKSUM: ", 0) == 0)
 		{
-			index = std::stoi(line.substr(7));
-			headerLines++;
+			std::string checksum = line.substr(10);
+			header.checksum = (char*)malloc(checksum.length() + 1);
+			if (header.checksum != NULL)
+			{
+				strcpy_s(header.checksum, checksum.length() + 1, checksum.c_str());
+			}
 		}
 
-		header += line + "\n";
+		headerLines++;
 	}
 
-	return headerLines >= 3;
+	return headerLines >= MAX_HEADER_LINES - 1;
 }
 
 
@@ -155,6 +217,8 @@ bool FileChunk::ParseHeader(int *dataLength, const char* packet)
 */
 char* FileChunk::GetPacket()
 {
+	std::string header = GenerateHeader();
+
 	if (header.empty())
 	{
 		return NULL;
@@ -168,7 +232,7 @@ char* FileChunk::GetPacket()
 
 	for (int i = 0; i < data.size(); i++)
 	{
-		packet[i + header.length()] = data[i];
+		packet[i + header.length() + 1] = data[i];
 	}
 
 	return packet;
