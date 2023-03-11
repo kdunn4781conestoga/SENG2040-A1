@@ -27,7 +27,7 @@ public:
 		Finished
 	};
 
-	FileServer();
+	FileServer(std::string filename = "", bool testing = false);
 
 	virtual void Initialize();
 	virtual char* GetPacket();

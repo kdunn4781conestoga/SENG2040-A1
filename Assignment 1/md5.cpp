@@ -1,15 +1,17 @@
 /*
-* FILE			: FileValidatorcpp
+* FILE			: md5.cpp
 * PROJECT		: Assignment 1
 * PROGRAMMERS	: Kyle Dunn & David Czachor
 * FIRST VERSION : 2023-02-10
 * DESCRIPTION	: This file holds the checksum algorithm
+* 
+* SOURCE          md5.cpp
+                  Copyright (c) 2014,2015 Stephan Brumme. All rights reserved.
+*                 see http://create.stephan-brumme.com/disclaimer.html
 */
 
 // //////////////////////////////////////////////////////////
-// md5.cpp
-// Copyright (c) 2014,2015 Stephan Brumme. All rights reserved.
-// see http://create.stephan-brumme.com/disclaimer.html
+// 
 //
 
 #include "md5.h"

@@ -21,10 +21,10 @@ Global
 		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Client|x64.Build.0 = Debug - Client|x64
 		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Client|x86.ActiveCfg = Debug - Client|Win32
 		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Client|x86.Build.0 = Debug - Client|Win32
-		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x64.ActiveCfg = Debug|x64
-		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x64.Build.0 = Debug|x64
-		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x86.ActiveCfg = Debug|Win32
-		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x86.Build.0 = Debug|Win32
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x64.ActiveCfg = Debug - Server|x64
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x64.Build.0 = Debug - Server|x64
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x86.ActiveCfg = Debug - Server|Win32
+		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug - Server|x86.Build.0 = Debug - Server|Win32
 		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug|x64.ActiveCfg = Debug|x64
 		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug|x64.Build.0 = Debug|x64
 		{178F390F-B493-4A26-90FE-A9CDC5C4C6BD}.Debug|x86.ActiveCfg = Debug|Win32

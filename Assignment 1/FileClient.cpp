@@ -8,7 +8,7 @@
 
 #include "FileClient.h"
 
-FileClient::FileClient(const char* filename) : FileTransfer(filename)
+FileClient::FileClient(std::string filename, bool testing) : FileTransfer(filename, testing)
 {
 	this->state = Disconnected;
 	this->currentIndex = 0;
@@ -23,16 +23,12 @@ FileClient::FileClient(const char* filename) : FileTransfer(filename)
 */
 void FileClient::Initialize()
 {
+	FileTransfer::Initialize();
+
 	this->state = Connected;
-	this->currentIndex = 0;
-	this->lastIndex = -1;
-	this->receivedChunks.clear();
-	this->sentChunks.clear();
 
 	// opens file
-	fopen_s(&file, filename.c_str(), "rb");
-
-	if (file == NULL)
+	if (!Open("rb"))
 	{
 		state = Disconnecting;
 		throw; // TODO
@@ -44,17 +40,18 @@ void FileClient::Initialize()
 	totalLength = ftell(file);
 
 	// closes file
-	if (fclose(file))
-	{
-		state = Disconnecting;
-		throw; // TODO
-	}
-
-	file = NULL;
+	Close();
 
 	SetConnected(true);
 }
 
+/*
+	Name	:   GetPacket
+	Purpose :   this is used to receive the packet to send
+	Inputs	:	NONE
+	Outputs	:	NONE
+	Returns	:	char*	|	pointer to the packet
+*/
 char* FileClient::GetPacket()
 {
 	if (IsConnected())
@@ -63,6 +60,10 @@ char* FileClient::GetPacket()
 
 		FileChunk* chunk = NULL;
 
+		/*
+		* reads from file and generates a chunk only if it's the start of the program
+		* or the current index doesn't match the last index
+		*/
 		if (lastIndex == -1 || currentIndex != lastIndex)
 		{
 			if (file == NULL && !Open("rb"))
@@ -70,13 +71,15 @@ char* FileClient::GetPacket()
 				return NULL;
 			}
 
+			// goes to specific position in file
 			fseek(file, currentLength, SEEK_SET);
 
 			chunk = new FileChunk();
 
+			// appends file contents to chunk
 			char buffer[2] = { 0 };
 			while (fread(buffer, 1, 1, file) != 0) {
-				if (!chunk->AppendData(buffer[0]) || chunk->GetData().size() > CHUNK_SIZE)
+				if (!chunk->AppendData(buffer[0]))
 				{
 					break;
 				}
@@ -89,16 +92,20 @@ char* FileClient::GetPacket()
 				return NULL;
 			}
 
+			// adds to sentChunk to keep track of it
 			sentChunks.push_back(*chunk);
 			lastIndex = currentIndex;
 		}
 		else
 		{
+			// sends the previous chunk if there's no response from the server
 			chunk = &sentChunks.back();
 		}
 
+		// checks for end of file
 		if (currentLength >= totalLength)
 		{
+			// generates the hash and adds it to the header
 			std::string hash = GenerateFileHash();
 
 			chunk->CreateHeader(filename, totalLength, currentIndex, hash.c_str());
@@ -127,6 +134,7 @@ int FileClient::ParsePacket(const char* packet)
 	{
 		state = Receiving;
 
+		// converts received packet to chunk for later processing
 		if (packet != NULL && strcmp(packet, "") != 0)
 		{
 			FileChunk chunk;
@@ -156,32 +164,40 @@ int FileClient::ProcessPacket()
 {
 	state = Validating;
 
+	// loops through sent chunks (usually only 1 but just in case there are more)
 	for (int s = 0; s < sentChunks.size(); s++)
 	{
 		bool done = false;
 
 		FileChunk* sChunk = &sentChunks[s];
 
+		// loops through received chunks
 		for (int r = 0; r < receivedChunks.size(); r++)
 		{
 			FileChunk* rChunk = &receivedChunks[r];
 
+			// skips this chunk if the indexes don't match
 			if (rChunk->GetIndex() != currentIndex)
 			{
 				continue;
 			}
 
+			// checks if the header length matches the data size
 			if (sChunk->GetHeader().length == rChunk->GetData().size())
 			{
+				// proceeds
 				done = true;
 
+				// check if end of file
 				if (currentLength >= totalLength)
 				{
+					// if chunk received has no checksum then it wasn't sent successfully
 					if (rChunk->GetHeader().checksum != NULL)
 						valid = true;
 
 					state = Disconnecting;
 
+					// ends program
 					SetFinished(true);
 				}
 
@@ -189,6 +205,7 @@ int FileClient::ProcessPacket()
 			}
 		}
 
+		// resets variables
 		if (done)
 		{
 			lastIndex = currentIndex;

@@ -1,15 +1,13 @@
 /*
-* FILE			: FileValidator.h
+* FILE			: md5.h
 * PROJECT		: Assignment 1
 * PROGRAMMERS	: Kyle Dunn & David Czachor
 * FIRST VERSION : 2023-02-07
+* 
+* SOURCE          md5.h
+                  Copyright (c) 2014,2015 Stephan Brumme. All rights reserved.
+*                 see http://create.stephan-brumme.com/disclaimer.html
 */
-
-// //////////////////////////////////////////////////////////
-// md5.h
-// Copyright (c) 2014 Stephan Brumme. All rights reserved.
-// see http://create.stephan-brumme.com/disclaimer.html
-//
 
 #pragma once
 

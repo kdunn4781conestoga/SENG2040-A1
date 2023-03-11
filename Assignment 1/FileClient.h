@@ -28,7 +28,7 @@ public:
 		Disconnecting
 	};
 
-	FileClient(const char* filename);
+	FileClient(std::string filename, bool testing = false);
 
 	virtual void Initialize();
 	virtual char* GetPacket();

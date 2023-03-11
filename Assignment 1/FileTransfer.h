@@ -23,26 +23,33 @@
 class FileTransfer
 {
 public:
-	FileTransfer(const std::string filename);
+	FileTransfer(const std::string filename, bool testing);
 	~FileTransfer();
 
 	std::string GenerateFileHash();
 
-	virtual void Initialize() = 0;
+	virtual void Initialize();
 	virtual char* GetPacket() = 0;
 	virtual int ParsePacket(const char* packet) = 0;
 	virtual int ProcessPacket() = 0;
+
+	inline void SetTesting(bool testing) { this->testing = testing; }
 	
 	inline virtual void SetConnected(bool connected) { this->connected = connected; }
 	inline bool IsConnected() { return this->connected; }
 
 	inline bool IsFinished() { return finished; }
 	inline bool IsValid() { return valid; }
+
+	inline long GetCurrentLength() { return currentLength; }
+	inline long GetTotalLength() { return totalLength; }
 protected:
 	bool Open(const char* mode);
 	bool Close();
 
 	inline void SetFinished(bool finished) { this->finished = finished; }
+
+	bool testing;
 
 	std::string filename;
 
@@ -58,6 +65,7 @@ protected:
 	std::vector<FileChunk> sentChunks;
 	std::vector<FileChunk> receivedChunks;
 private:
+
 	bool connected;
 	bool finished;
 };

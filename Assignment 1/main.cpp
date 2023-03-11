@@ -137,32 +137,68 @@ int main( int argc, char * argv[] )
 		Server
 	};
 
+	bool testing = false;
 	Mode mode = Server;
 	Address address;
 
 	// create instance of FileTransfer class
 	FileTransfer* fileTransfer = NULL;
 
-	// variables for storing filenames
-
-	if ( argc >= 3 )
+	// checks for client arguments
+	int a, b, c, d;
+	if (argc >= 3 && sscanf_s(argv[1], "%d.%d.%d.%d", &a, &b, &c, &d))
 	{
-		int a,b,c,d;
-		if ( sscanf_s( argv[1], "%d.%d.%d.%d", &a, &b, &c, &d ) )
+		mode = Client;
+		address = Address(a, b, c, d, ServerPort);
+
+		// sets the input filename
+		char filename[FILENAME_LENGTH];
+		if (sscanf_s(argv[2], "%s", &filename, FILENAME_LENGTH))
 		{
-			mode = Client;
-			address = Address(a,b,c,d,ServerPort);
+			printf("transferring %s\n", filename);
+
+			fileTransfer = new FileClient(filename);
 		}
 
-		char filename[FILENAME_LENGTH];
-		if (sscanf_s(argv[2], "%s", &filename, sizeof(filename)))
+		// check for --test argument
+		if (argc >= 4)
 		{
-			fileTransfer = new FileClient((char*)filename);
+			if (strcmp(argv[3], "--test") == 0)
+			{
+				testing = true;
+			}
+		}
+	}
+	else
+	{
+		// checks for server arguments
+		for (int i = 1; i < argc; i++)
+		{
+			char filename[FILENAME_LENGTH];
+			if (strcmp(argv[i], "--test") == 0) // check for --test argument
+			{
+				testing = true;
+			}
+			else if (sscanf_s(argv[i], "%s", &filename, FILENAME_LENGTH)) // check for filename
+			{
+				printf("saving file transfer as %s\n", filename);
+
+				fileTransfer = new FileServer(filename);
+			}
 		}
 	}
 
-	if (mode == Server)
+	// initialize a default FileServer if one doesn't exist
+	if (mode == Server && fileTransfer == NULL)
 		fileTransfer = new FileServer();
+
+	// set testing mode
+	fileTransfer->SetTesting(testing);
+	if (testing)
+	{
+		printf("program is in test mode\n");
+	}
+
 
 	// initialize
 
@@ -227,8 +263,10 @@ int main( int argc, char * argv[] )
 			break;
 		}
 
+		// checks if the file transfer is finished
 		if (fileTransfer->IsFinished())
 		{
+			// outputs message whether the transfer was valid
 			if (fileTransfer->IsValid())
 			{
 				printf("file transfer successful!\n");
@@ -238,6 +276,7 @@ int main( int argc, char * argv[] )
 				printf("file transfer failed :(\n");
 			}
 
+			// stops the connection
 			connection.Stop();
 			break;
 		}
@@ -261,19 +300,6 @@ int main( int argc, char * argv[] )
 				strncpy_s(packet, PacketSize, filePacket, _TRUNCATE);
 			}
 
-			// CLIENT
-			// check if any packets need to be resent
-			// call function in the FileTransfer instance for getting packet
-			// the function will include the protocol header and part of file
-			// FileTransfer will keep track of the current and total ammount sent
-			// and also in what order they were sent in.
-			// sends a specific packet indicating that it has transferred everything
-			// with the checksum
-			// 
-			// SERVER
-			// checks to see if any packets were received from FileTransfer
-			// calls FileTransfer function to get a packet to send back to the client
-			// that confirms the packet was sent
 			connection.SendPacket((unsigned char*)packet, sizeof( packet ) );
 			sendAccumulator -= 1.0f / sendRate;
 		}
@@ -289,19 +315,6 @@ int main( int argc, char * argv[] )
 			{
 				fileTransfer->ParsePacket(packet);
 			}
-			// 
-			// CLIENT
-			// here it checks for the server's return message
-			// FileTransfer processes it and determines if it's valid or needs to be resent
-			// this information would be stored in the instance of FileTransfer
-			// 
-			// SERVER
-			// validates the packet and determines if the protocol is valid
-			// sends the packet to a FileTransfer function that saves it locally
-			// FileTransfer will store the total amount received
-			// 
-			// if the packet received is to indicate end of file transfer
-			// generate a checksum for the file and compare it with the one received
 		}
 		
 		// show packets that were acked this frame
@@ -323,6 +336,9 @@ int main( int argc, char * argv[] )
 		
 		connection.Update( DeltaTime );
 
+		// process packets
+		fileTransfer->ProcessPacket();
+
 		// show connection stats
 		
 		statsAccumulator += DeltaTime;
@@ -342,12 +358,16 @@ int main( int argc, char * argv[] )
 				rtt * 1000.0f, sent_packets, acked_packets, lost_packets, 
 				sent_packets > 0.0f ? (float) lost_packets / (float) sent_packets * 100.0f : 0.0f, 
 				sent_bandwidth, acked_bandwidth );
+
+			printf("%d / %d", fileTransfer->GetCurrentLength(), fileTransfer->GetTotalLength());
+
+			if (mode == Server)
+				printf(" received\n");
+			else
+				printf(" transferred\n");
 			
 			statsAccumulator -= 0.25f;
 		}
-
-		// process packets
-		fileTransfer->ProcessPacket();
 
 		net::wait( DeltaTime );
 	}
