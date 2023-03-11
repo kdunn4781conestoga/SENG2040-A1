@@ -28,8 +28,8 @@ using namespace net;
 const int ServerPort = 30000;
 const int ClientPort = 30001;
 const int ProtocolId = 0x11223344;
-const float DeltaTime = 1.0f / 90.0f; //1.0f / 30.0f;
-const float SendRate = 1.0f / 90.0f; //1.0f / 30.0f;
+const float DeltaTime = 1.0f / 10.0f;
+const float SendRate = 1.0f / 10.0f;
 const float TimeOut = 10.0f;
 const int PacketSize = 256;
 
@@ -229,7 +229,15 @@ int main( int argc, char * argv[] )
 
 		if (fileTransfer->IsFinished())
 		{
-			printf("file transfer completed\n");
+			if (fileTransfer->IsValid())
+			{
+				printf("file transfer successful!\n");
+			}
+			else
+			{
+				printf("file transfer failed :(\n");
+			}
+
 			connection.Stop();
 			break;
 		}

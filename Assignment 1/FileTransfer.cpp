@@ -8,6 +8,8 @@
 
 #include "FileTransfer.h"
 
+#include "md5.h"
+
 
 FileTransfer::FileTransfer(const std::string filename)
 {
@@ -57,4 +59,26 @@ bool FileTransfer::Close()
 	file = NULL;
 
 	return true;
+}
+
+std::string FileTransfer::GenerateFileHash()
+{
+	if (!Open("rb"))
+	{
+		return NULL;
+	}
+
+	std::string fileContents = "";
+
+	char buffer[2] = { 0 };
+	while (fread(buffer, 1, 1, file) != 0) {
+		fileContents += buffer;
+	}
+
+	Close();
+
+	MD5 md5;
+	md5.add(fileContents.c_str(), fileContents.size());
+
+	return md5.getHash();
 }

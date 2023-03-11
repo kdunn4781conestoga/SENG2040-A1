@@ -26,6 +26,8 @@ public:
 	FileTransfer(const std::string filename);
 	~FileTransfer();
 
+	std::string GenerateFileHash();
+
 	virtual void Initialize() = 0;
 	virtual char* GetPacket() = 0;
 	virtual int ParsePacket(const char* packet) = 0;
@@ -35,6 +37,7 @@ public:
 	inline bool IsConnected() { return this->connected; }
 
 	inline bool IsFinished() { return finished; }
+	inline bool IsValid() { return valid; }
 protected:
 	bool Open(const char* mode);
 	bool Close();
@@ -50,6 +53,7 @@ protected:
 
 	int lastIndex;
 	int currentIndex;
+	bool valid;
 
 	std::vector<FileChunk> sentChunks;
 	std::vector<FileChunk> receivedChunks;

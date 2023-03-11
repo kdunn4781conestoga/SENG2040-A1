@@ -32,14 +32,14 @@
     <ClCompile Include="FileClient.cpp" />
     <ClCompile Include="FileTransfer.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="FileValidator.cpp" />
+    <ClCompile Include="md5.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileChunk.h" />
     <ClInclude Include="FileServer.h" />
     <ClInclude Include="FileClient.h" />
     <ClInclude Include="FileTransfer.h" />
-    <ClInclude Include="FileValidator.h" />
+    <ClInclude Include="md5.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="SimpleProtocol.h" />
   </ItemGroup>

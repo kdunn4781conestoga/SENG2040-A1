@@ -51,8 +51,11 @@ char* FileServer::GetPacket()
 
 			chunk->CreateHeader(filename, totalLength, chunk->GetIndex(), chunk->GetHeader().checksum);
 
-			if (chunk->GetHeader().checksum != NULL)
+			if (currentLength >= totalLength)
 			{
+				if (chunk->GetHeader().checksum != NULL)
+					valid = true;
+
 				state = Listening;
 
 				SetFinished(true);
@@ -152,7 +155,12 @@ int FileServer::ProcessPacket()
 			// check if last of chunks
 			if (chunk->GetHeader().checksum != NULL && currentLength >= totalLength)
 			{
-				std::cout << "Verifying file..." << std::endl;
+				std::string hash = GenerateFileHash();
+
+				if (hash != chunk->GetHeader().checksum)
+				{
+					chunk->CreateHeader(filename, totalLength, currentIndex);
+				}
 			}
 
 			lastIndex = currentIndex;

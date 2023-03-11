@@ -38,13 +38,6 @@ bool FileChunk::ReadPacket(const char* packet)
 		return false;
 	}
 
-	//std::cout << "Header: "<< std::endl << packet << std::endl << std::endl;
-
-	if (header.checksum != NULL)
-	{
-		printf("End?\n");
-	}
-
 	char* cPos = (char*)packet + GenerateHeader().size() + 1;
 	while (true)
 	{
@@ -91,6 +84,7 @@ bool FileChunk::AppendData(const char data)
 */
 void FileChunk::CreateHeader(std::string filename, long filesize, int index, const char* checksum)
 {
+	header = SimpleProtocol();
 	header.filename = filename;
 	header.filesize = filesize;
 	header.index = index;

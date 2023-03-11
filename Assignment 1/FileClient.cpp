@@ -99,9 +99,9 @@ char* FileClient::GetPacket()
 
 		if (currentLength >= totalLength)
 		{
-			std::cout << "Reached EOF" << std::endl;
+			std::string hash = GenerateFileHash();
 
-			chunk->CreateHeader(filename, totalLength, currentIndex, "Random Test");
+			chunk->CreateHeader(filename, totalLength, currentIndex, hash.c_str());
 		}
 		else
 		{
@@ -175,6 +175,16 @@ int FileClient::ProcessPacket()
 			{
 				done = true;
 
+				if (currentLength >= totalLength)
+				{
+					if (rChunk->GetHeader().checksum != NULL)
+						valid = true;
+
+					state = Disconnecting;
+
+					SetFinished(true);
+				}
+
 				break;
 			}
 		}
@@ -186,13 +196,6 @@ int FileClient::ProcessPacket()
 
 			sentChunks.clear();
 			receivedChunks.clear();
-
-			if (currentLength >= totalLength)
-			{
-				state = Disconnecting;
-				
-				SetFinished(true);
-			}
 
 			break;
 		}
