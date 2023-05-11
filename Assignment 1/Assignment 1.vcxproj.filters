@@ -18,22 +18,19 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileSend.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleProtocol.cpp">
+    <ClCompile Include="FileClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FileChunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileReceive.cpp">
+    <ClCompile Include="FileServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FileTransfer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileValidator.cpp">
+    <ClCompile Include="md5.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,7 +38,7 @@
     <ClInclude Include="Net.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileSend.h">
+    <ClInclude Include="FileClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SimpleProtocol.h">
@@ -50,13 +47,13 @@
     <ClInclude Include="FileChunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileReceive.h">
+    <ClInclude Include="FileServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FileTransfer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileValidator.h">
+    <ClInclude Include="md5.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

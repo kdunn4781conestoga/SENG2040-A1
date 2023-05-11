@@ -8,20 +8,48 @@
 
 #include "FileTransfer.h"
 
+#include "md5.h"
 
-FileTransfer::FileTransfer(const std::string filename)
+
+FileTransfer::FileTransfer(const std::string filename, bool testing)
 {
 	this->file = NULL;
 	this->currentLength = 0;
 	this->totalLength = 0;
 	this->filename = filename;
 	this->currentIndex = -1;
-	this->lastChunk = NULL;
+	this->lastIndex = -1;
+	this->testing = testing;
+	this->valid = false;
+	this->connected = false;
+	this->finished = false;
 }
 
 FileTransfer::~FileTransfer()
 {
 	Close();
+}
+
+/*
+	Name	:   Initialize
+	Purpose :   this is used to setup the file transfer for receiving
+	Inputs	:	NONE
+	Outputs	:	NONE
+	Returns	:	NONE
+*/
+void FileTransfer::Initialize()
+{
+	Close();
+
+	this->currentLength = 0;
+	this->totalLength = 0;
+	this->currentIndex = 0;
+	this->lastIndex = -1;
+	this->valid = false;
+	this->connected = false;
+	this->finished = false;
+	this->receivedChunks.clear();
+	this->sentChunks.clear();
 }
 
 /*
@@ -47,6 +75,11 @@ bool FileTransfer::Open(const char* mode)
 */
 bool FileTransfer::Close()
 {
+	if (file == NULL)
+	{
+		return true;
+	}
+
 	if (fclose(file))
 	{
 		return false;
@@ -55,4 +88,35 @@ bool FileTransfer::Close()
 	file = NULL;
 
 	return true;
+}
+
+/*
+	Name	:   Initialize
+	Purpose :   this is used to generate a hash from the file
+	Inputs	:	NONE
+	Outputs	:	NONE
+	Returns	:	string	| the generated hash
+*/
+std::string FileTransfer::GenerateFileHash()
+{
+	if (!Open("rb"))
+	{
+		return NULL;
+	}
+
+	// reads through file while appending to fileContents
+	std::string fileContents = "";
+	char buffer[2] = { 0 };
+	while (fread(buffer, 1, 1, file) != 0) {
+		fileContents += buffer;
+	}
+
+	Close();
+
+	// add fileContents to the md5 class
+	MD5 md5;
+	md5.add(fileContents.c_str(), fileContents.size());
+
+	// generates a hash from the file contents
+	return md5.getHash();
 }
